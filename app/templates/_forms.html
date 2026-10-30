@@ -1,0 +1,35 @@
+{# Macros de formulário. Uso: {% import "_forms.html" as f %}. `form` é o objeto app.forms.Form, ou None. #}
+{% macro _erro(form, nome) %}{% if form and form.erros.get(nome) %}<span class="erro-campo" id="erro-{{ nome }}">{{ form.erros[nome] }}</span>{% endif %}{% endmacro %}
+
+{% macro campo(form, nome, rotulo, valor=None, tipo='text', ajuda=None, obrigatorio=True, passo=None) %}
+{% set atual = form.valores.get(nome, '') if form else (valor if valor is not none else '') %}
+<label class="campo {{ 'com-erro' if form and form.erros.get(nome) }}">
+  <span>{{ rotulo }}{% if not obrigatorio %} <em>(opcional)</em>{% endif %}</span>
+  <input name="{{ nome }}" type="{{ tipo }}" value="{{ atual }}"{% if tipo == 'number' %} step="{{ passo or 'any' }}" min="0"{% endif %}{% if form and form.erros.get(nome) %} aria-invalid="true" aria-describedby="erro-{{ nome }}"{% endif %}>
+  {% if ajuda %}<small>{{ ajuda }}</small>{% endif %}
+  {{ _erro(form, nome) }}
+</label>
+{% endmacro %}
+
+{# opcoes: lista de pares (valor, texto) #}
+{% macro selecao(form, nome, rotulo, opcoes, valor=None, obrigatorio=True, vazio='Selecione...') %}
+{% set atual = form.valores.get(nome, '') if form else (valor if valor is not none else '') %}
+<label class="campo {{ 'com-erro' if form and form.erros.get(nome) }}">
+  <span>{{ rotulo }}{% if not obrigatorio %} <em>(opcional)</em>{% endif %}</span>
+  <select name="{{ nome }}"{% if form and form.erros.get(nome) %} aria-invalid="true" aria-describedby="erro-{{ nome }}"{% endif %}>
+    {% if vazio %}<option value="">{{ vazio }}</option>{% endif %}
+    {% for v, t in opcoes %}<option value="{{ v }}"{% if v|string == atual|string %} selected{% endif %}>{{ t }}</option>{% endfor %}
+  </select>
+  {{ _erro(form, nome) }}
+</label>
+{% endmacro %}
+
+{% macro caixa(form, nome, rotulo, valor=False) %}
+{% set atual = form.valores.get(nome) if form else valor %}
+<label class="campo-caixa"><input type="checkbox" name="{{ nome }}" value="1"{% if atual %} checked{% endif %}> <span>{{ rotulo }}</span></label>
+{% endmacro %}
+
+{% macro area(form, nome, rotulo, valor=None) %}
+{% set atual = form.valores.get(nome, '') if form else (valor or '') %}
+<label class="campo campo-largo"><span>{{ rotulo }} <em>(opcional)</em></span><textarea name="{{ nome }}" rows="3">{{ atual }}</textarea></label>
+{% endmacro %}

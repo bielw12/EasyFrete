@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{{ titulo|default('Painel') }}{% endblock %} · {{ nome_produto }}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/vendor/htmx.min.js" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block classe_body %}{% endblock %}">
+  <aside class="lateral">
+    <a class="marca" href="/"><span class="marca-simbolo" aria-hidden="true"></span><span class="rotulo-menu">{{ nome_produto }}</span></a>
+    <nav>
+      {% for url, nome, icone in menu %}
+      {% set ativo = request.url.path == url or (url != '/' and request.url.path.startswith(url + '/')) %}
+      <a href="{{ url }}" class="{{ 'ativo' if ativo }}" title="{{ nome }}"{% if ativo %} aria-current="page"{% endif %}>
+        <svg class="icone" aria-hidden="true"><use href="/static/icones.svg#{{ icone }}"></use></svg>
+        <span class="rotulo-menu">{{ nome }}</span>
+        {% if icone == 'alerta' and alertas_criticos %}<span class="contador">{{ alertas_criticos }}</span>{% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+  </aside>
+  <main class="conteudo">
+    {% if msg %}<div class="aviso aviso-ok" role="status">{{ msg }}</div>{% endif %}
+    {% if erro_msg %}<div class="aviso aviso-erro" role="alert">{{ erro_msg }}</div>{% endif %}
+    {% block conteudo %}{% endblock %}
+  </main>
+  <script src="/static/js/app.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
