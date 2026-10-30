@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>{{ r.nome }}</h1><p>{{ r.origem_cidade }}/{{ r.origem_uf }} → {{ r.destino_cidade }}/{{ r.destino_uf }}</p></div>
+  <div class="acoes">
+    <a class="botao" href="/rotas">Voltar à lista</a>
+    <a class="botao" href="/rotas/{{ r.id }}/editar">Editar</a>
+    <form class="embutido" method="post" action="/rotas/{{ r.id }}/excluir" data-confirmar="Excluir a rota {{ r.nome }}? Esta ação não pode ser desfeita.">
+      <button type="submit" class="botao-perigo">Excluir</button>
+    </form>
+  </div>
+</header>
+<section class="cartao">
+  <h2>Dados cadastrais</h2>
+  <dl class="dados">
+    <div><dt>Distância</dt><dd>{{ r.distancia_km|exato }} km</dd></div>
+    <div><dt>Tempo estimado</dt><dd>{{ r.tempo_estimado_h|exato }} h</dd></div>
+    <div><dt>Pedágio estimado</dt><dd>{{ r.pedagio_estimado|brl }}</dd></div>
+    <div><dt>Frete de tabela</dt><dd>{{ r.frete_tabela|brl }}</dd></div>
+    <div><dt>UFs de passagem</dt><dd>{{ r.ufs_passagem.replace(',', ', ') or 'Nenhuma' }}</dd></div>
+  </dl>
+</section>
+{% endblock %}

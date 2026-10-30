@@ -106,8 +106,8 @@ input:not([type=checkbox]):not([type=file]), select, textarea {
   background: #fff; border: 1px solid #c9c5ba; border-radius: 5px;
 }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--marca-2); outline-offset: 1px; }
-.com-erro input, .com-erro select, .com-erro textarea { border-color: var(--critico); }
-.erro-campo { color: var(--critico); font-size: 12px; font-weight: 500; }
+.com-erro input:not([type=checkbox]):not([type=file]), .com-erro select, .com-erro textarea { border-color: var(--critico); }
+.campo > .erro-campo { color: var(--critico); font-size: 12px; font-weight: 500; }
 .acoes-form { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 4px; }
 
 /* Botões */
@@ -151,3 +151,24 @@ form.embutido { display: inline; }
   .grade-2, .grade-3 { grid-template-columns: minmax(0, 1fr); }
 }
 @media print { .lateral { display: none; } .conteudo { margin-left: 0; } }
+
+/* Cadastros: busca, ações de linha, dados de ficha e seções de formulário */
+.campo-busca { flex: 1 1 260px; max-width: 420px; }
+.acoes-linha { text-align: right; white-space: nowrap; }
+.acoes-linha form { margin-left: 2px; }
+.vencimento, .nao-quebra { white-space: nowrap; }
+.vencimento .selo { display: block; width: fit-content; margin-top: 2px; }
+.dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px 20px; margin: 0; }
+.dados dt { font-size: 12px; color: var(--tinta-2); }
+.dados dd { margin: 1px 0 0; font-size: 14px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.secao-form { grid-column: 1 / -1; margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--linha); }
+.secao-form:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+@media (max-width: 1280px) {
+  .tabela-cadastro th, .tabela-cadastro td { padding-left: 6px; padding-right: 6px; }
+  .acoes-linha .botao, .acoes-linha button { width: 100%; justify-content: center; }
+  .acoes-linha form { display: block; margin: 3px 0 0; }
+}
+@media (max-width: 900px) { .col-secundaria { display: none; } }
+
+/* Formulário já enviado, aguardando resposta */
+form[data-enviando] button[type="submit"] { opacity: .6; cursor: progress; }

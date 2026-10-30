@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>{{ titulo }}</h1><p>Todos os campos são obrigatórios.</p></div>
+</header>
+<nav class="abas">
+  <a href="/clientes">Clientes</a>
+  <a {% if not c %}class="ativo" aria-current="page"{% endif %} href="/clientes/novo">Novo cliente</a>
+  {% if c %}<a class="ativo" aria-current="page" href="/clientes/{{ c.id }}/editar">Editar {{ c.nome }}</a>{% endif %}
+</nav>
+<div class="cartao">
+  <form class="formulario" method="post" action="{{ '/clientes/%d/editar'|format(c.id) if c else '/clientes/novo' }}" novalidate>
+    {{ f.campo(form, 'nome', 'Nome', c.nome) }}
+    {{ f.campo(form, 'cnpj', 'CNPJ', c.cnpj, ajuda='Ex.: 12.345.678/0001-90') }}
+    <div class="acoes-form">
+      <button type="submit" class="botao-primario">{{ 'Salvar alterações' if c else 'Cadastrar cliente' }}</button>
+      <a class="botao" href="/clientes">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

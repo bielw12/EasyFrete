@@ -4,11 +4,16 @@ from pathlib import Path
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
+from jinja2 import pass_context
+from markupsafe import Markup
 from sqlalchemy import func, select
 
-from app.config import NOME_PRODUTO
+from app.config import NOME_PRODUTO, agora
 from app.db import SessionLocal
+from app.forms import UFS
 from app.models import Alerta
+from app.services import regras
+from app.services.consultas import carregar_config
 
 MENU = [
     ("/", "Painel", "painel"),
@@ -53,6 +58,13 @@ def numero(valor, casas: int = 0) -> str:
     return _milhar(f"{valor:,.{casas}f}")
 
 
+def numero_exato(valor) -> str:
+    """Para dados cadastrais: mostra as casas que o valor tem, sem arredondar. 926.5 vira 926,5 e 25000.0 vira 25.000."""
+    if valor is None:
+        return "—"
+    return _milhar(f"{valor:,.6f}".rstrip("0").rstrip("."))
+
+
 def pct(valor, casas: int = 1) -> str:
     """Recebe o percentual já em escala 0–100."""
     return "—" if valor is None else f"{numero(valor, casas)}%"
@@ -73,22 +85,46 @@ def rotulo(valor) -> str:
     return ROTULOS.get(valor, str(valor).replace("_", " ").capitalize())
 
 
+def _texto_vencimento(situacao) -> str:
+    dias = situacao.dias_restantes
+    if situacao.status == "ok":
+        return "Em dia"
+    if dias < 0:
+        return f"Vencido há {-dias} dia{'s' if dias < -1 else ''}"
+    return "Vence hoje" if dias == 0 else f"Vence em {dias} dia{'s' if dias > 1 else ''}"
+
+
+@pass_context
+def selo_vencimento(contexto, venc) -> Markup:
+    """Uso: {{ veiculo.venc_crlv|selo_vencimento }}. Segue o limiar `doc_avencer_dias` da tela Configurações."""
+    situacao = regras.situacao_documento(venc, agora(), contexto["doc_avencer_dias"])
+    if situacao is None:
+        return Markup('<span class="selo">Não informado</span>')
+    classe = {"vencido": "critico", "a_vencer": "atencao", "ok": "ok"}[situacao.status]
+    return Markup('<span class="selo selo-{}">{}</span>').format(classe, _texto_vencimento(situacao))
+
+
 def _globais(request: Request) -> dict:
     with SessionLocal() as sessao:
         criticos = sessao.scalar(
             select(func.count()).select_from(Alerta).where(Alerta.status == "aberto", Alerta.severidade == "critico")
         )
+        doc_avencer_dias = carregar_config(sessao)["doc_avencer_dias"]
     return {
         "nome_produto": NOME_PRODUTO,
         "menu": MENU,
         "alertas_criticos": criticos,
+        "doc_avencer_dias": doc_avencer_dias,
         "msg": request.query_params.get("msg"),
         "erro_msg": request.query_params.get("erro"),
     }
 
 
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates", context_processors=[_globais])
-templates.env.filters.update(brl=brl, numero=numero, pct=pct, data=data_br, datahora=datahora_br, rotulo=rotulo)
+templates.env.filters.update(
+    brl=brl, numero=numero, exato=numero_exato, pct=pct, data=data_br, datahora=datahora_br, rotulo=rotulo, selo_vencimento=selo_vencimento
+)
+templates.env.globals["opcoes_uf"] = [(uf, uf) for uf in UFS]
 
 
 def render(request: Request, nome: str, status_code: int = 200, **contexto):

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>{{ c.nome }}</h1><p>CNPJ {{ c.cnpj }}</p></div>
+  <div class="acoes">
+    <a class="botao" href="/clientes">Voltar à lista</a>
+    <a class="botao" href="/clientes/{{ c.id }}/editar">Editar</a>
+    <form class="embutido" method="post" action="/clientes/{{ c.id }}/excluir" data-confirmar="Excluir o cliente {{ c.nome }}? Esta ação não pode ser desfeita.">
+      <button type="submit" class="botao-perigo">Excluir</button>
+    </form>
+  </div>
+</header>
+<section class="cartao">
+  <h2>Dados cadastrais</h2>
+  <dl class="dados">
+    <div><dt>Nome</dt><dd>{{ c.nome }}</dd></div>
+    <div><dt>CNPJ</dt><dd>{{ c.cnpj }}</dd></div>
+  </dl>
+</section>
+{% endblock %}

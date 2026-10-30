@@ -3,9 +3,11 @@
 
 {% macro campo(form, nome, rotulo, valor=None, tipo='text', ajuda=None, obrigatorio=True, passo=None) %}
 {% set atual = form.valores.get(nome, '') if form else (valor if valor is not none else '') %}
+{% if atual is float %}{% set atual = atual|exato %}{% endif %}
 <label class="campo {{ 'com-erro' if form and form.erros.get(nome) }}">
   <span>{{ rotulo }}{% if not obrigatorio %} <em>(opcional)</em>{% endif %}</span>
-  <input name="{{ nome }}" type="{{ tipo }}" value="{{ atual }}"{% if tipo == 'number' %} step="{{ passo or 'any' }}" min="0"{% endif %}{% if form and form.erros.get(nome) %} aria-invalid="true" aria-describedby="erro-{{ nome }}"{% endif %}>
+  {# tipo='number' vira texto: o type=number do navegador transforma 1.234,56 em 1.23456 sem avisar. Quem interpreta o formato pt-BR é o servidor. #}
+  <input name="{{ nome }}" type="{{ 'text' if tipo == 'number' else tipo }}" value="{{ atual }}"{% if tipo == 'number' %} inputmode="{{ 'numeric' if passo == '1' else 'decimal' }}"{% endif %}{% if form and form.erros.get(nome) %} aria-invalid="true" aria-describedby="erro-{{ nome }}"{% endif %}>
   {% if ajuda %}<small>{{ ajuda }}</small>{% endif %}
   {{ _erro(form, nome) }}
 </label>

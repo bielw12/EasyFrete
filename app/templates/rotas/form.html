@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>{{ titulo }}</h1><p>Campos sem a marca "opcional" são obrigatórios.</p></div>
+</header>
+<nav class="abas">
+  <a href="/rotas">Rotas</a>
+  <a {% if not r %}class="ativo" aria-current="page"{% endif %} href="/rotas/novo">Nova rota</a>
+  {% if r %}<a class="ativo" aria-current="page" href="/rotas/{{ r.id }}/editar">Editar {{ r.nome }}</a>{% endif %}
+</nav>
+<div class="cartao">
+  <form class="formulario" method="post" action="{{ '/rotas/%d/editar'|format(r.id) if r else '/rotas/novo' }}" novalidate>
+    {{ f.campo(form, 'nome', 'Nome da rota', r.nome, ajuda='Ex.: São Paulo – Curitiba') }}
+
+    <h2 class="secao-form">Trajeto</h2>
+    {{ f.campo(form, 'origem_cidade', 'Cidade de origem', r.origem_cidade) }}
+    {{ f.selecao(form, 'origem_uf', 'UF de origem', opcoes_uf, r.origem_uf) }}
+    {{ f.campo(form, 'destino_cidade', 'Cidade de destino', r.destino_cidade) }}
+    {{ f.selecao(form, 'destino_uf', 'UF de destino', opcoes_uf, r.destino_uf) }}
+    {{ f.campo(form, 'ufs_passagem', 'UFs de passagem', r.ufs_passagem, ajuda='Além de origem e destino. Ex.: MG,PR', obrigatorio=False) }}
+
+    <h2 class="secao-form">Estimativas e tabela</h2>
+    {{ f.campo(form, 'distancia_km', 'Distância (km)', r.distancia_km, tipo='number') }}
+    {{ f.campo(form, 'tempo_estimado_h', 'Tempo estimado (horas)', r.tempo_estimado_h, tipo='number') }}
+    {{ f.campo(form, 'pedagio_estimado', 'Pedágio estimado (R$)', r.pedagio_estimado, tipo='number') }}
+    {{ f.campo(form, 'frete_tabela', 'Frete de tabela (R$)', r.frete_tabela, tipo='number') }}
+
+    <div class="acoes-form">
+      <button type="submit" class="botao-primario">{{ 'Salvar alterações' if r else 'Cadastrar rota' }}</button>
+      <a class="botao" href="/rotas">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

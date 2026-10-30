@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Rotas</h1><p>Corredores atendidos, distância, pedágio e frete de tabela.</p></div>
+</header>
+<nav class="abas">
+  <a class="ativo" href="/rotas" aria-current="page">Rotas</a>
+  <a href="/rotas/novo">Nova rota</a>
+</nav>
+{% if rotas or q %}
+{% with url='/rotas', dica='Nome, cidade ou UF' %}{% include "_busca.html" %}{% endwith %}
+{% endif %}
+{% if rotas %}
+<div class="cartao tabela-rolagem">
+  <table class="tabela-cadastro">
+    <thead>
+      <tr>
+        <th>Nome</th><th>Origem</th><th>Destino</th><th class="col-secundaria">Passa por</th>
+        <th class="num">Distância</th><th class="num">Pedágio est.</th><th class="num col-secundaria">Tempo est.</th><th class="num">Frete de tabela</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rotas %}
+      <tr>
+        <td><a href="/rotas/{{ r.id }}"><strong>{{ r.nome }}</strong></a></td>
+        <td>{{ r.origem_cidade }}/{{ r.origem_uf }}</td>
+        <td>{{ r.destino_cidade }}/{{ r.destino_uf }}</td>
+        <td class="col-secundaria">{{ r.ufs_passagem.replace(',', ', ') or '—' }}</td>
+        <td class="num">{{ r.distancia_km|exato }} km</td>
+        <td class="num">{{ r.pedagio_estimado|brl }}</td>
+        <td class="num col-secundaria">{{ r.tempo_estimado_h|exato }} h</td>
+        <td class="num">{{ r.frete_tabela|brl }}</td>
+        <td class="acoes-linha">
+          <a class="botao botao-pequeno" href="/rotas/{{ r.id }}/editar">Editar</a>
+          <form class="embutido" method="post" action="/rotas/{{ r.id }}/excluir" data-confirmar="Excluir a rota {{ r.nome }}? Esta ação não pode ser desfeita.">
+            <button type="submit" class="botao-pequeno botao-perigo">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif q %}
+<div class="vazio"><strong>Nenhuma rota encontrada</strong><p>Nada corresponde a "{{ q }}". Tente outra cidade ou UF.</p></div>
+{% else %}
+<div class="vazio">
+  <strong>Nenhuma rota cadastrada ainda</strong>
+  <p>Cadastre os corredores para comparar o frete de tabela com o praticado.</p>
+  <p><a class="botao botao-primario" href="/rotas/novo">Cadastrar rota</a></p>
+</div>
+{% endif %}
+{% endblock %}

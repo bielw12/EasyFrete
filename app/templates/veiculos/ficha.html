@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div>
+    <h1>{{ v.placa }} <span class="selo {{ {'ativo': 'selo-ok', 'manutencao': 'selo-atencao'}.get(v.status, '') }}">{{ v.status|rotulo }}</span></h1>
+    <p>{{ v.tipo|rotulo }} · {{ v.modelo }} · {{ v.ano }}</p>
+  </div>
+  <div class="acoes">
+    <a class="botao" href="/veiculos">Voltar à lista</a>
+    <a class="botao" href="/veiculos/{{ v.id }}/editar">Editar</a>
+    <form class="embutido" method="post" action="/veiculos/{{ v.id }}/excluir" data-confirmar="Excluir o veículo {{ v.placa }}? Esta ação não pode ser desfeita.">
+      <button type="submit" class="botao-perigo">Excluir</button>
+    </form>
+  </div>
+</header>
+<div class="grade grade-2">
+  <section class="cartao">
+    <h2>Dados cadastrais</h2>
+    <dl class="dados">
+      <div><dt>Capacidade</dt><dd>{{ v.capacidade_kg|exato }} kg</dd></div>
+      <div><dt>Tanque</dt><dd>{{ v.tanque_l|exato }} litros</dd></div>
+      <div><dt>Consumo de referência</dt><dd>{{ v.consumo_ref_kmpl|exato }} km/l</dd></div>
+      <div><dt>Odômetro</dt><dd>{{ v.odometro_km|exato }} km</dd></div>
+      <div><dt>Custo fixo mensal</dt><dd>{{ v.custo_fixo_mensal|brl }}</dd></div>
+      <div><dt>Base</dt><dd>{{ v.cidade_base }}/{{ v.uf_base }}</dd></div>
+    </dl>
+  </section>
+  <section class="cartao">
+    <h2>Documentos</h2>
+    <table>
+      <thead><tr><th>Documento</th><th>Vencimento</th><th>Situação</th></tr></thead>
+      <tbody>
+        <tr><td>CRLV</td><td>{{ v.venc_crlv|data }}</td><td>{{ v.venc_crlv|selo_vencimento }}</td></tr>
+        <tr><td>Seguro</td><td>{{ v.venc_seguro|data }}</td><td>{{ v.venc_seguro|selo_vencimento }}</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{# Busca simples por GET. Variáveis: url, q, dica. #}
+<form class="filtros" method="get" action="{{ url }}" role="search">
+  <label class="campo campo-busca"><span>Buscar</span><input type="search" name="q" value="{{ q }}" placeholder="{{ dica }}"></label>
+  <button type="submit">Buscar</button>
+  {% if q %}<a class="botao" href="{{ url }}">Limpar</a>{% endif %}
+</form>

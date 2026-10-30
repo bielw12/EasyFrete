@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Clientes</h1><p>Embarcadores atendidos pela transportadora.</p></div>
+</header>
+<nav class="abas">
+  <a class="ativo" href="/clientes" aria-current="page">Clientes</a>
+  <a href="/clientes/novo">Novo cliente</a>
+</nav>
+{% if clientes or q %}
+{% with url='/clientes', dica='Nome ou CNPJ' %}{% include "_busca.html" %}{% endwith %}
+{% endif %}
+{% if clientes %}
+<div class="cartao tabela-rolagem">
+  <table class="tabela-cadastro">
+    <thead><tr><th>Nome</th><th>CNPJ</th><th></th></tr></thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td><a href="/clientes/{{ c.id }}"><strong>{{ c.nome }}</strong></a></td>
+        <td class="nao-quebra">{{ c.cnpj }}</td>
+        <td class="acoes-linha">
+          <a class="botao botao-pequeno" href="/clientes/{{ c.id }}/editar">Editar</a>
+          <form class="embutido" method="post" action="/clientes/{{ c.id }}/excluir" data-confirmar="Excluir o cliente {{ c.nome }}? Esta ação não pode ser desfeita.">
+            <button type="submit" class="botao-pequeno botao-perigo">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif q %}
+<div class="vazio"><strong>Nenhum cliente encontrado</strong><p>Nada corresponde a "{{ q }}". Tente outro nome ou CNPJ.</p></div>
+{% else %}
+<div class="vazio">
+  <strong>Nenhum cliente cadastrado ainda</strong>
+  <p>Cadastre os clientes para saber quanto cada um realmente rende.</p>
+  <p><a class="botao botao-primario" href="/clientes/novo">Cadastrar cliente</a></p>
+</div>
+{% endif %}
+{% endblock %}

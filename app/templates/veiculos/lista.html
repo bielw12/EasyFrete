@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Veículos</h1><p>Frota, documentos e custos fixos.</p></div>
+</header>
+<nav class="abas">
+  <a class="ativo" href="/veiculos" aria-current="page">Veículos</a>
+  <a href="/veiculos/novo">Novo veículo</a>
+</nav>
+{% if veiculos or q %}
+{% with url='/veiculos', dica='Placa, modelo, tipo ou cidade' %}{% include "_busca.html" %}{% endwith %}
+{% endif %}
+{% if veiculos %}
+<div class="cartao tabela-rolagem">
+  <table class="tabela-cadastro">
+    <thead>
+      <tr>
+        <th>Placa</th><th class="col-secundaria">Tipo</th><th>Modelo</th><th class="num col-secundaria">Ano</th><th>Base</th>
+        <th>CRLV</th><th>Seguro</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in veiculos %}
+      <tr>
+        <td class="nao-quebra"><a href="/veiculos/{{ v.id }}"><strong>{{ v.placa }}</strong></a></td>
+        <td class="col-secundaria">{{ v.tipo|rotulo }}</td>
+        <td>{{ v.modelo }}</td>
+        <td class="num col-secundaria">{{ v.ano }}</td>
+        <td>{{ v.cidade_base }}/{{ v.uf_base }}</td>
+        <td class="vencimento">{{ v.venc_crlv|data }} {{ v.venc_crlv|selo_vencimento }}</td>
+        <td class="vencimento">{{ v.venc_seguro|data }} {{ v.venc_seguro|selo_vencimento }}</td>
+        <td><span class="selo {{ {'ativo': 'selo-ok', 'manutencao': 'selo-atencao'}.get(v.status, '') }}">{{ v.status|rotulo }}</span></td>
+        <td class="acoes-linha">
+          <a class="botao botao-pequeno" href="/veiculos/{{ v.id }}/editar">Editar</a>
+          <form class="embutido" method="post" action="/veiculos/{{ v.id }}/excluir" data-confirmar="Excluir o veículo {{ v.placa }}? Esta ação não pode ser desfeita.">
+            <button type="submit" class="botao-pequeno botao-perigo">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif q %}
+<div class="vazio"><strong>Nenhum veículo encontrado</strong><p>Nada corresponde a "{{ q }}". Tente outra placa ou modelo.</p></div>
+{% else %}
+<div class="vazio">
+  <strong>Nenhum veículo cadastrado ainda</strong>
+  <p>Cadastre o primeiro caminhão para acompanhar custos, consumo e documentos.</p>
+  <p><a class="botao botao-primario" href="/veiculos/novo">Cadastrar veículo</a></p>
+</div>
+{% endif %}
+{% endblock %}

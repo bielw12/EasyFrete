@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Motoristas</h1><p>Equipe, habilitação e valores de comissão e diária.</p></div>
+</header>
+<nav class="abas">
+  <a class="ativo" href="/motoristas" aria-current="page">Motoristas</a>
+  <a href="/motoristas/novo">Novo motorista</a>
+</nav>
+{% if motoristas or q %}
+{% with url='/motoristas', dica='Nome ou CPF' %}{% include "_busca.html" %}{% endwith %}
+{% endif %}
+{% if motoristas %}
+<div class="cartao tabela-rolagem">
+  <table class="tabela-cadastro">
+    <thead>
+      <tr>
+        <th>Nome</th><th class="col-secundaria">CPF</th><th>Cat.</th><th>CNH</th><th>MOPP</th>
+        <th class="num col-secundaria">Comissão</th><th class="num">Diária</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in motoristas %}
+      <tr>
+        <td><a href="/motoristas/{{ m.id }}"><strong>{{ m.nome }}</strong></a></td>
+        <td class="nao-quebra col-secundaria">{{ m.cpf }}</td>
+        <td>{{ m.cnh_categoria }}</td>
+        <td class="vencimento">{{ m.venc_cnh|data }} {{ m.venc_cnh|selo_vencimento }}</td>
+        <td class="vencimento">{% if m.venc_mopp %}{{ m.venc_mopp|data }} {{ m.venc_mopp|selo_vencimento }}{% else %}<span class="selo">Não possui</span>{% endif %}</td>
+        <td class="num col-secundaria">{{ m.comissao_pct|exato }}%</td>
+        <td class="num">{{ m.diaria_valor|brl }}</td>
+        <td><span class="selo {{ 'selo-ok' if m.status == 'ativo' }}">{{ m.status|rotulo }}</span></td>
+        <td class="acoes-linha">
+          <a class="botao botao-pequeno" href="/motoristas/{{ m.id }}/editar">Editar</a>
+          <form class="embutido" method="post" action="/motoristas/{{ m.id }}/excluir" data-confirmar="Excluir o motorista {{ m.nome }}? Esta ação não pode ser desfeita.">
+            <button type="submit" class="botao-pequeno botao-perigo">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif q %}
+<div class="vazio"><strong>Nenhum motorista encontrado</strong><p>Nada corresponde a "{{ q }}". Tente outro nome ou CPF.</p></div>
+{% else %}
+<div class="vazio">
+  <strong>Nenhum motorista cadastrado ainda</strong>
+  <p>Cadastre a equipe para acompanhar CNH, MOPP e jornada.</p>
+  <p><a class="botao botao-primario" href="/motoristas/novo">Cadastrar motorista</a></p>
+</div>
+{% endif %}
+{% endblock %}

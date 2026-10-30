@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div>
+    <h1>{{ m.nome }} <span class="selo {{ 'selo-ok' if m.status == 'ativo' }}">{{ m.status|rotulo }}</span></h1>
+    <p>CPF {{ m.cpf }} · CNH categoria {{ m.cnh_categoria }}</p>
+  </div>
+  <div class="acoes">
+    <a class="botao" href="/motoristas">Voltar à lista</a>
+    <a class="botao" href="/motoristas/{{ m.id }}/editar">Editar</a>
+    <form class="embutido" method="post" action="/motoristas/{{ m.id }}/excluir" data-confirmar="Excluir o motorista {{ m.nome }}? Esta ação não pode ser desfeita.">
+      <button type="submit" class="botao-perigo">Excluir</button>
+    </form>
+  </div>
+</header>
+<div class="grade grade-2">
+  <section class="cartao">
+    <h2>Dados cadastrais</h2>
+    <dl class="dados">
+      <div><dt>Comissão</dt><dd>{{ m.comissao_pct|exato }}% do frete</dd></div>
+      <div><dt>Diária</dt><dd>{{ m.diaria_valor|brl }}</dd></div>
+    </dl>
+  </section>
+  <section class="cartao">
+    <h2>Documentos</h2>
+    <table>
+      <thead><tr><th>Documento</th><th>Vencimento</th><th>Situação</th></tr></thead>
+      <tbody>
+        <tr><td>CNH</td><td>{{ m.venc_cnh|data }}</td><td>{{ m.venc_cnh|selo_vencimento }}</td></tr>
+        <tr>
+          <td>MOPP</td>
+          <td>{{ m.venc_mopp|data }}</td>
+          <td>{% if m.venc_mopp %}{{ m.venc_mopp|selo_vencimento }}{% else %}<span class="selo">Não possui</span>{% endif %}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

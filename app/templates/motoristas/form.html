@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>{{ titulo }}</h1><p>Campos sem a marca "opcional" são obrigatórios.</p></div>
+</header>
+<nav class="abas">
+  <a href="/motoristas">Motoristas</a>
+  <a {% if not m %}class="ativo" aria-current="page"{% endif %} href="/motoristas/novo">Novo motorista</a>
+  {% if m %}<a class="ativo" aria-current="page" href="/motoristas/{{ m.id }}/editar">Editar {{ m.nome }}</a>{% endif %}
+</nav>
+<div class="cartao">
+  <form class="formulario" method="post" action="{{ '/motoristas/%d/editar'|format(m.id) if m else '/motoristas/novo' }}" novalidate>
+    <h2 class="secao-form">Identificação</h2>
+    {{ f.campo(form, 'nome', 'Nome', m.nome) }}
+    {{ f.campo(form, 'cpf', 'CPF', m.cpf, ajuda='Ex.: 123.456.789-00') }}
+    {{ f.selecao(form, 'status', 'Status', opcoes_status, m.status if m else 'ativo', vazio=None) }}
+
+    <h2 class="secao-form">Habilitação</h2>
+    {{ f.selecao(form, 'cnh_categoria', 'Categoria da CNH', categorias, m.cnh_categoria) }}
+    {{ f.campo(form, 'venc_cnh', 'Vencimento da CNH', m.venc_cnh, tipo='date') }}
+    {{ f.campo(form, 'venc_mopp', 'Vencimento do MOPP', m.venc_mopp, tipo='date', obrigatorio=False) }}
+
+    <h2 class="secao-form">Remuneração por viagem</h2>
+    {{ f.campo(form, 'comissao_pct', 'Comissão (% do frete)', m.comissao_pct, tipo='number') }}
+    {{ f.campo(form, 'diaria_valor', 'Diária (R$)', m.diaria_valor, tipo='number') }}
+
+    <div class="acoes-form">
+      <button type="submit" class="botao-primario">{{ 'Salvar alterações' if m else 'Cadastrar motorista' }}</button>
+      <a class="botao" href="/motoristas">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
