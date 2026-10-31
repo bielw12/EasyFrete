@@ -1,6 +1,7 @@
 @echo off
 rem Prepara o ambiente e inicia o app. Uso: dois cliques ou "iniciar.bat" no terminal.
 setlocal
+title Servidor do sistema - mantenha esta janela aberta
 chcp 65001 >nul
 cd /d "%~dp0"
 
@@ -45,4 +46,6 @@ if errorlevel 1 (
 )
 
 ".venv\Scripts\python.exe" -m app %*
-if errorlevel 1 pause
+echo.
+echo O sistema foi encerrado. Se apareceu algum erro acima, veja a secao de erros comuns no README.md.
+pause
